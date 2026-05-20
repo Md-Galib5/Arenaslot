@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { CalendarDays, MapPin, Building2 } from "lucide-react";
+import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 
@@ -59,13 +60,17 @@ const Banner = () => {
             {/* BUTTONS */}
             <div className="flex flex-col sm:flex-row items-center lg:items-start gap-4 mt-8">
 
+            <Link href="/facilities">
               <button className="w-full sm:w-auto sm:min-w-[180px] bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-xl font-semibold transition duration-300 shadow-md hover:shadow-green-300">
                 Explore Facilities
               </button>
+              </Link>
 
+            <Link href="/add-facilities">
               <button className="w-full sm:w-auto sm:min-w-[180px] border border-gray-300 hover:border-green-500 px-8 py-3 rounded-xl font-semibold text-gray-800 transition duration-300">
                 Become a Host
               </button>
+              </Link>
 
             </div>
 
