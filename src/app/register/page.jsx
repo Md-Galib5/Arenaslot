@@ -35,7 +35,6 @@ export default function SignUpPage() {
 
       console.log("REGISTER RESPONSE:", res);
 
-      // ❗ IMPORTANT: handle all possible error shapes
       if (res?.error) {
         toast.error(res.error.message || "Registration failed ❌");
         return;
@@ -43,9 +42,9 @@ export default function SignUpPage() {
 
       toast.success("Registration successful 🎉");
 
-      // ✅ FORCE NAVIGATION (MOST RELIABLE WAY)
-      window.location.href = "/login";
-
+setTimeout(() => {
+  router.push("/login");
+}, 800);
     } catch (err) {
       console.log("ERROR:", err);
       toast.error("Something went wrong ❌");
@@ -66,41 +65,57 @@ export default function SignUpPage() {
 
         <form onSubmit={onSubmit} className="flex flex-col gap-4">
 
+          {/* NAME */}
           <TextField name="name" isRequired>
             <Label>Full Name</Label>
             <Input className="w-full h-11 rounded-xl border border-emerald-200" />
             <FieldError />
           </TextField>
 
+          {/* IMAGE */}
           <TextField name="image" isRequired>
             <Label>Image URL</Label>
             <Input className="w-full h-11 rounded-xl border border-emerald-200" />
             <FieldError />
           </TextField>
 
+          {/* EMAIL */}
           <TextField name="email" isRequired type="email">
             <Label>Email</Label>
             <Input className="w-full h-11 rounded-xl border border-emerald-200" />
             <FieldError />
           </TextField>
 
+          {/* PASSWORD */}
           <TextField
             name="password"
             isRequired
             type="password"
             validate={(value) => {
-              if (value.length <= 6) return "Min 6 characters";
-              if (!/[A-Z]/.test(value)) return "1 uppercase required";
-              if (!/[a-z]/.test(value)) return "1 lowercase required";
+              if (value.length < 6) {
+                return "At least 6 characters required";
+              }
+              if (!/[A-Z]/.test(value)) {
+                return "Must include 1 uppercase letter";
+              }
+              if (!/[a-z]/.test(value)) {
+                return "Must include 1 lowercase letter";
+              }
               return null;
             }}
           >
             <Label>Password</Label>
+
             <Input className="w-full h-11 rounded-xl border border-emerald-200" />
-            <Description>6+ chars, uppercase & lowercase</Description>
+
+            <Description>
+              At least 6 characters, 1 uppercase & 1 lowercase
+            </Description>
+
             <FieldError />
           </TextField>
 
+          {/* SUBMIT */}
           <Button
             type="submit"
             className="w-full h-11 bg-emerald-600 text-white rounded-xl"
@@ -110,6 +125,7 @@ export default function SignUpPage() {
 
         </form>
 
+        {/* GOOGLE */}
         <div className="mt-6">
           <button className="w-full h-11 border rounded-xl flex items-center justify-center gap-2">
             <FaGoogle className="text-red-500" />

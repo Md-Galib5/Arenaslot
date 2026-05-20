@@ -16,34 +16,37 @@ import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "react-toastify";
 
-export default function SignUpPage() {
+export default function SignInPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   const onSubmit = async (e) => {
     e.preventDefault();
+
     setLoading(true);
 
     const email = e.target.email.value;
     const password = e.target.password.value;
 
-    const { error } = await authClient.signIn.email({
-      email,
-      password,
-      callbackURL: "/",
-    });
+    try {
+      const { error } = await authClient.signIn.email({
+        email,
+        password,
+      });
 
-    setLoading(false);
+      setLoading(false);
 
-    if (error) {
-      toast.error(error.message || "Login failed ❌");
-      router.push("/register");
-      return;
+      if (error) {
+        toast.error(error.message || "Login failed ❌");
+        return;
+      }
+
+      toast.success("Login successful 🎉");
+      router.push("/");
+    } catch (err) {
+      setLoading(false);
+      toast.error("Something went wrong ❌");
     }
-
-    toast.success("Login successful 🎉");
-
-    setTimeout(() => router.push("/"), 600);
   };
 
   const handleGoogleSignIn = async () => {
@@ -52,7 +55,7 @@ export default function SignUpPage() {
       toast.success("Google login successful 🎉");
       setTimeout(() => router.push("/"), 800);
     } catch {
-      toast.error("Google login failed");
+      toast.error("Google login failed ❌");
     }
   };
 
@@ -83,57 +86,48 @@ export default function SignUpPage() {
 
           {/* EMAIL */}
           <TextField isRequired name="email" type="email" className="w-full">
-            <Label className="text-gray-700 font-medium mb-2 block">
-              Email Address
-            </Label>
+            <Label>Email Address</Label>
 
-            <div className="w-full">
-              <Input
-                placeholder="you@example.com"
-                className="w-full h-12 rounded-xl border border-emerald-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition"
-              />
-            </div>
+            <Input
+              placeholder="you@example.com"
+              className="w-full h-12 rounded-xl border border-emerald-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition"
+            />
 
             <FieldError />
           </TextField>
 
           {/* PASSWORD */}
           <TextField
-  isRequired
-  minLength={6}
-  name="password"
-  type="password"
-  className="w-full"
-  validate={(value) => {
-    if (value.length < 6) {
-      return "At least 6 characters required";
-    }
-    if (!/[A-Z]/.test(value)) {
-      return "Must include at least 1 uppercase letter";
-    }
-    if (!/[a-z]/.test(value)) {
-      return "Must include at least 1 lowercase letter";
-    }
-    return null;
-  }}
->
-  <Label className="text-gray-700 font-medium mb-2 block">
-    Password
-  </Label>
+            isRequired
+            name="password"
+            type="password"
+            className="w-full"
+            validate={(value) => {
+              if (value.length < 6) {
+                return "At least 6 characters required";
+              }
+              if (!/[A-Z]/.test(value)) {
+                return "Must include at least 1 uppercase letter";
+              }
+              if (!/[a-z]/.test(value)) {
+                return "Must include at least 1 lowercase letter";
+              }
+              return null;
+            }}
+          >
+            <Label>Password</Label>
 
-  <div className="w-full">
-    <Input
-      placeholder="••••••••"
-      className="w-full h-12 rounded-xl border border-emerald-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition"
-    />
-  </div>
+            <Input
+              placeholder="••••••••"
+              className="w-full h-12 rounded-xl border border-emerald-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition"
+            />
 
-  <Description className="text-xs text-gray-400 mt-2">
-    At least 6 characters, 1 uppercase & 1 lowercase letter required
-  </Description>
+            <Description className="text-xs text-gray-400 mt-2">
+              At least 6 characters, 1 uppercase & 1 lowercase letter required
+            </Description>
 
-  <FieldError />
-</TextField>
+            <FieldError />
+          </TextField>
 
           {/* BUTTONS */}
           <div className="flex flex-col gap-4 mt-4 w-full">
