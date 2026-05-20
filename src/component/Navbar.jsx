@@ -109,10 +109,16 @@ const Navbar = () => {
                 </ul>
 
                 {/* Desktop Login */}
-                <div className="hidden sm:flex items-center gap-3">
+                <div className="hidden sm:flex items-center gap-5">
                     <Link href="/login">
                         <Button variant="ghost">
                             Login
+                        </Button>
+                    </Link>
+
+                    <Link href="/register">
+                        <Button variant="ghost">
+                            Register
                         </Button>
                     </Link>
                 </div>
@@ -230,6 +236,16 @@ const Navbar = () => {
                                 Login
                             </Button>
                         </Link>
+
+                        <Link href="/register">
+                            <Button
+                                variant="solid"
+                                className=" text-black font-medium"
+                            >
+                                Register
+                            </Button>
+                        </Link>
+
 
                     </div>
 
