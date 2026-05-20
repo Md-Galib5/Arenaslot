@@ -5,20 +5,36 @@ const AddSportFacilityForm = () => {
   const onSubmit = async (e) => {
     e.preventDefault();
 
-    const formData = new FormData(e.currentTarget);
+    const form = e.currentTarget;
+
+    const formData = new FormData(form);
     const facilities = Object.fromEntries(formData.entries());
 
     console.log("Submitted Data:", facilities);
 
-    const res = await fetch('http://localhost:8080/facilities',{
-        method: 'POST',
+    try {
+      const res = await fetch("http://localhost:8080/facilities", {
+        method: "POST",
         headers: {
-            'content-type' : 'application/json'
+          "content-type": "application/json",
         },
-        body: JSON.stringify(facilities)
-    })
-    const data = await res.json()
-    console.log(data)
+        body: JSON.stringify(facilities),
+      });
+
+      const data = await res.json();
+      console.log(data);
+
+      if (res.ok) {
+        // ✅ RESET FORM AFTER SUCCESS
+        form.reset();
+        alert("Facility added successfully!");
+      } else {
+        alert("Failed to add facility");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Something went wrong");
+    }
   };
 
   return (

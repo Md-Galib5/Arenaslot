@@ -55,7 +55,7 @@ const BookingForm = ({
 
         <div className="w-full h-full bg-white border border-gray-100 rounded-3xl shadow-lg overflow-hidden flex flex-col">
 
-            {/* HEADER */}
+
             <div className="bg-gradient-to-r from-green-500 to-emerald-600 p-6 text-white">
                 <h2 className="text-2xl font-bold">
                     Book Your Facility
@@ -65,10 +65,10 @@ const BookingForm = ({
                 </p>
             </div>
 
-            {/* BODY */}
+
             <div className="p-6 space-y-6 flex-1 overflow-y-auto">
 
-                {/* Facility */}
+
                 <div>
                     <label className="text-sm font-medium text-gray-600">
                         Facility Name
@@ -78,7 +78,7 @@ const BookingForm = ({
                     </div>
                 </div>
 
-                {/* Date */}
+
                 <div>
                     <label className="text-sm font-medium text-gray-600">
                         Booking Date
@@ -89,7 +89,7 @@ const BookingForm = ({
                     />
                 </div>
 
-                {/* Slot Select */}
+
                 <div>
                     <label className="text-sm font-medium text-gray-600">
                         Available Time Slots
@@ -111,7 +111,7 @@ const BookingForm = ({
                     </select>
                 </div>
 
-                {/* Sub Slots */}
+
                 {expandedSlots.length > 0 && (
                     <div>
                         <div className="flex items-center justify-between mb-3">
@@ -146,7 +146,6 @@ const BookingForm = ({
                     </div>
                 )}
 
-                {/* PRICE */}
                 <div className="bg-gradient-to-r from-gray-50 to-gray-100 border rounded-2xl p-5 flex items-center justify-between">
                     <div>
                         <p className="text-sm text-gray-500">Total Price</p>
@@ -162,7 +161,7 @@ const BookingForm = ({
 
             </div>
 
-            {/* BUTTON */}
+
             <div className="p-6 border-t">
                 <button
                     type="submit"
