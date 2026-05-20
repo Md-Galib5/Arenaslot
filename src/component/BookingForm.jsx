@@ -53,7 +53,7 @@ const BookingForm = ({
 
     return (
 
-        <div className="w-full h-full bg-white border border-gray-100 rounded-3xl shadow-lg overflow-hidden flex flex-col">
+        <div className=" bg-white border border-gray-100 rounded-3xl shadow-lg overflow-hidden flex flex-col">
 
 
             <div className="bg-gradient-to-r from-green-500 to-emerald-600 p-6 text-white">
