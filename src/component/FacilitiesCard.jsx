@@ -22,22 +22,30 @@ const FacilitiesCard = ({ facilities }) => {
         capacity,
     } = facilities;
 
-    return (
-        <div className="bg-white rounded-2xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 group">
+   return (
+    <div className="group relative overflow-hidden rounded-[28px] border border-emerald-100 bg-white shadow-sm hover:shadow-2xl hover:shadow-emerald-100/60 transition-all duration-500 hover:-translate-y-2">
 
-            {/* Image Section */}
-            <div className="relative overflow-hidden">
+        {/* Glow Effect */}
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/0 via-green-100/0 to-emerald-500/10 opacity-0 group-hover:opacity-100 transition duration-500 z-0" />
 
-                <Image
-                    alt={facilityName}
-                    src={image}
-                    width={400}
-                    height={400}
-                    className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-500"
-                />
+        {/* IMAGE SECTION */}
+        <div className="relative overflow-hidden h-60">
 
-                {/* Facility Type Badge */}
-                <span className="absolute top-3 left-3 bg-white/95 backdrop-blur-sm text-xs font-semibold text-gray-700 px-3 py-1 rounded-full shadow-sm flex items-center gap-1.5">
+            <Image
+                alt={facilityName}
+                src={image}
+                width={500}
+                height={500}
+                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+            />
+
+            {/* Dark Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+
+            {/* Facility Type */}
+            <div className="absolute top-4 left-4">
+
+                <span className="flex items-center gap-2 rounded-full bg-white/90 backdrop-blur-md px-4 py-2 text-xs font-semibold text-emerald-700 shadow-lg border border-white/40">
 
                     <Trophy size={14} />
 
@@ -45,88 +53,116 @@ const FacilitiesCard = ({ facilities }) => {
 
                 </span>
 
-                {/* Rating Badge */}
-                <div className="absolute bottom-3 right-3 bg-white px-2 py-1 rounded-lg flex items-center gap-1 shadow-sm">
-
-                    <span className="text-sm font-semibold text-gray-800">
-                        4.8
-                    </span>
-
-                    <Star
-                        size={14}
-                        className="fill-yellow-400 text-yellow-400"
-                    />
-
-                </div>
             </div>
 
-            {/* Content */}
-            <div className="p-5">
+            {/* Price */}
+            <div className="absolute bottom-4 right-4">
 
-                {/* Title */}
-                <h2 className="text-xl font-bold text-gray-900 line-clamp-1">
-                    {facilityName}
-                </h2>
+                <div className="rounded-2xl bg-emerald-500 px-4 py-2 text-white shadow-xl">
 
-                {/* Location */}
-                <div className="flex items-center gap-1 mt-2 text-gray-500">
-
-                    <MapPin size={15} />
-
-                    <p className="text-sm">
-                        {location}
+                    <p className="text-xs opacity-90">
+                        Price / Hour
                     </p>
 
-                </div>
-
-                {/* Capacity */}
-                <div className="flex items-center gap-2 mt-4 text-gray-600">
-
-                    <Users size={16} />
-
-                    <span className="text-sm">
-                        Up to {capacity} Players
-                    </span>
+                    <h2 className="text-2xl font-bold">
+                        ${pricePerHour}
+                    </h2>
 
                 </div>
 
-                {/* Bottom Section */}
-                <div className="flex items-center justify-between mt-6">
+            </div>
 
-                    {/* Price */}
-                    <div>
+        </div>
 
-                        <h3 className="text-2xl font-bold text-blue-600">
-                            ${pricePerHour}
+        {/* CONTENT */}
+        <div className="relative p-6 z-10">
 
-                            <span className="text-sm text-gray-500 ml-1">
-                                / hour
-                            </span>
-                        </h3>
+            {/* TITLE */}
+            <div>
+
+                <h2 className="text-2xl font-bold text-gray-900 group-hover:text-emerald-600 transition duration-300">
+
+                    {facilityName}
+
+                </h2>
+
+                <p className="mt-2 text-sm text-gray-500 line-clamp-2">
+                    Premium sports facility with modern amenities and professional environment.
+                </p>
+
+            </div>
+
+            {/* INFO CARDS */}
+            <div className="mt-5 space-y-3">
+
+                {/* LOCATION */}
+                <div className="flex items-center gap-3 rounded-2xl border border-gray-100 bg-gray-50 px-4 py-3">
+
+                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600">
+
+                        <MapPin size={18} />
 
                     </div>
 
-                    {/* Book Button */}
-                    <NextLink
-                        href={`/facilities/${_id}`}
-                        className="inline-flex items-center gap-2 bg-green-500 hover:bg-green-700 px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-all duration-200"
-                    >
+                    <div>
 
-                        <CalendarCheck
-                            size={18}
-                            className="text-white"
-                        />
+                        <p className="text-xs text-gray-400">
+                            Location
+                        </p>
 
-                        <span className="text-white">
-                            Book Now
-                        </span>
+                        <p className="text-sm font-semibold text-gray-700">
+                            {location}
+                        </p>
 
-                    </NextLink>
+                    </div>
 
                 </div>
+
+                {/* CAPACITY */}
+                <div className="flex items-center gap-3 rounded-2xl border border-gray-100 bg-gray-50 px-4 py-3">
+
+                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-green-100 text-green-600">
+
+                        <Users size={18} />
+
+                    </div>
+
+                    <div>
+
+                        <p className="text-xs text-gray-400">
+                            Capacity
+                        </p>
+
+                        <p className="text-sm font-semibold text-gray-700">
+                            Up to {capacity} Players
+                        </p>
+
+                    </div>
+
+                </div>
+
             </div>
+
+            {/* BUTTON */}
+            <div className="mt-6">
+
+                <NextLink
+                    href={`/facilities/${_id}`}
+                    className="flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-500 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-200 transition-all duration-300 hover:scale-[1.02]"
+                >
+
+                    <CalendarCheck size={18} />
+
+                    Book Now
+
+                </NextLink>
+
+            </div>
+
         </div>
-    );
+
+    </div>
+);
 };
 
 export default FacilitiesCard;
