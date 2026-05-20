@@ -39,10 +39,10 @@ const FacilitiesCard = ({ facilities }) => {
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
             />
 
-            {/* Dark Overlay */}
+       
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
 
-            {/* Facility Type */}
+    
             <div className="absolute top-4 left-4">
 
                 <span className="flex items-center gap-2 rounded-full bg-white/90 backdrop-blur-md px-4 py-2 text-xs font-semibold text-emerald-700 shadow-lg border border-white/40">
@@ -55,7 +55,6 @@ const FacilitiesCard = ({ facilities }) => {
 
             </div>
 
-            {/* Price */}
             <div className="absolute bottom-4 right-4">
 
                 <div className="rounded-2xl bg-emerald-500 px-4 py-2 text-white shadow-xl">
@@ -74,10 +73,8 @@ const FacilitiesCard = ({ facilities }) => {
 
         </div>
 
-        {/* CONTENT */}
         <div className="relative p-6 z-10">
 
-            {/* TITLE */}
             <div>
 
                 <h2 className="text-2xl font-bold text-gray-900 group-hover:text-emerald-600 transition duration-300">
@@ -86,16 +83,9 @@ const FacilitiesCard = ({ facilities }) => {
 
                 </h2>
 
-                <p className="mt-2 text-sm text-gray-500 line-clamp-2">
-                    Premium sports facility with modern amenities and professional environment.
-                </p>
-
             </div>
 
-            {/* INFO CARDS */}
             <div className="mt-5 space-y-3">
-
-                {/* LOCATION */}
                 <div className="flex items-center gap-3 rounded-2xl border border-gray-100 bg-gray-50 px-4 py-3">
 
                     <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600">
@@ -118,7 +108,6 @@ const FacilitiesCard = ({ facilities }) => {
 
                 </div>
 
-                {/* CAPACITY */}
                 <div className="flex items-center gap-3 rounded-2xl border border-gray-100 bg-gray-50 px-4 py-3">
 
                     <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-green-100 text-green-600">
@@ -143,7 +132,6 @@ const FacilitiesCard = ({ facilities }) => {
 
             </div>
 
-            {/* BUTTON */}
             <div className="mt-6">
 
                 <NextLink

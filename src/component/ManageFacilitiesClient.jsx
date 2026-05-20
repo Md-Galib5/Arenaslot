@@ -408,10 +408,6 @@ const ManageFacilitiesClient = ({ initialData }) => {
   ))}
 
 </div>
-      {/* ===================== */}
-      {/* DELETE MODAL */}
-      {/* ===================== */}
-
       <AnimatePresence>
 
         {showDeleteModal && (
@@ -492,7 +488,6 @@ const ManageFacilitiesClient = ({ initialData }) => {
 
               </div>
 
-              {/* BODY */}
 
               <div className="p-6">
 
@@ -560,9 +555,6 @@ const ManageFacilitiesClient = ({ initialData }) => {
 
       </AnimatePresence>
 
-      {/* ===================== */}
-      {/* EDIT MODAL */}
-      {/* ===================== */}
 
       <AnimatePresence>
 
