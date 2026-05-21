@@ -6,8 +6,12 @@ const DetailsPage = async ({ params }) => {
 
     const { id } = await params;
 
+
     const res = await fetch(
         `http://localhost:8080/facilities/${id}`,
+        {
+
+        },
         { cache: "no-store" }
     );
 

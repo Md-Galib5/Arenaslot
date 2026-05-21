@@ -12,7 +12,10 @@ import {
   Trash2,
   X,
   AlertTriangle,
+  CalendarX,
 } from "lucide-react";
+
+import Link from "next/link";
 import { toast } from "react-toastify";
 
 const MyBookings = () => {
@@ -47,45 +50,37 @@ const MyBookings = () => {
     fetchBookings();
   }, [user]);
 
-  // DELETE BOOKING (REAL API)
- const handleDelete = async () => {
-  if (!selectedBooking) return;
+  // DELETE BOOKING
+  const handleDelete = async () => {
+    if (!selectedBooking) return;
 
-  try {
-    setLoadingId(selectedBooking._id);
+    try {
+      setLoadingId(selectedBooking._id);
 
-    const res = await fetch(
-      `http://localhost:8080/booking/${selectedBooking._id}`,
-      {
-        method: "DELETE",
-      }
-    );
+      const res = await fetch(
+        `http://localhost:8080/booking/${selectedBooking._id}`,
+        { method: "DELETE" }
+      );
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (!res.ok) {
-      throw new Error(data?.message || "Delete failed");
+      if (!res.ok) throw new Error(data?.message || "Delete failed");
+
+      setBookings((prev) =>
+        prev.filter((b) => b._id !== selectedBooking._id)
+      );
+
+      setShowDeleteModal(false);
+      setSelectedBooking(null);
+
+      toast.success("Booking cancelled successfully ✅");
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to cancel booking ❌");
+    } finally {
+      setLoadingId(null);
     }
-
-    setBookings((prev) =>
-      prev.filter((b) => b._id !== selectedBooking._id)
-    );
-
-    setShowDeleteModal(false);
-    setSelectedBooking(null);
-
-    // ✅ SUCCESS TOAST
-    toast.success("Booking cancelled successfully ✅");
-
-  } catch (error) {
-    console.log(error);
-
-    toast.error("Failed to cancel booking ❌");
-
-  } finally {
-    setLoadingId(null);
-  }
-};
+  };
 
   // LOADING UI
   if (loading) {
@@ -96,14 +91,44 @@ const MyBookings = () => {
     );
   }
 
+  // ================= EMPTY STATE =================
+  if (bookings.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-green-100 px-6">
+        <div className="text-center max-w-md bg-white shadow-xl rounded-3xl p-10 border border-green-100">
+
+          <div className="flex justify-center mb-5">
+            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
+              <CalendarX className="text-green-600 w-10 h-10" />
+            </div>
+          </div>
+
+          <h2 className="text-2xl font-bold text-gray-800">
+            No Bookings Yet
+          </h2>
+
+          <p className="text-gray-500 mt-2">
+            You haven’t booked any facilities yet. Start exploring and book your first game!
+          </p>
+
+          <Link href="/facilities">
+            <button className="mt-6 px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium">
+              Explore Facilities
+            </button>
+          </Link>
+
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-green-100 py-12 px-6">
 
       <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8">
 
-        {/* ================= USER PANEL ================= */}
+        {/* USER PANEL */}
         <div className="lg:w-1/3 lg:sticky lg:top-10 h-fit">
-
           <div className="bg-gradient-to-br from-green-600 to-emerald-700 text-white rounded-3xl shadow-2xl p-8 text-center">
 
             <h2 className="text-sm uppercase tracking-widest opacity-80">
@@ -111,10 +136,7 @@ const MyBookings = () => {
             </h2>
 
             <img
-              src={
-                user?.image ||
-                "https://i.ibb.co/2kR1YkS/user.png"
-              }
+              src={user?.image || "https://i.ibb.co/2kR1YkS/user.png"}
               className="w-28 h-28 rounded-full border-4 border-white mx-auto mt-6 shadow-lg object-cover"
             />
 
@@ -136,7 +158,7 @@ const MyBookings = () => {
           </div>
         </div>
 
-        {/* ================= BOOKINGS ================= */}
+        {/* BOOKINGS LIST */}
         <div className="lg:w-2/3 space-y-6">
 
           {bookings.map((booking) => (
@@ -147,21 +169,14 @@ const MyBookings = () => {
 
               <div className="flex flex-col md:flex-row">
 
-                {/* IMAGE */}
                 <img
-                  src={
-                    booking.image ||
-                    "https://images.unsplash.com/photo-1547347298-4074fc3086f0"
-                  }
+                  src={booking.image}
                   className="w-full md:w-56 h-48 object-cover"
                 />
 
-                {/* CONTENT */}
                 <div className="p-6 flex-1">
 
-                  {/* TITLE */}
                   <div className="flex justify-between">
-
                     <h2 className="text-2xl font-bold text-gray-800">
                       {booking.facilityName}
                     </h2>
@@ -170,7 +185,6 @@ const MyBookings = () => {
                       <Hourglass size={14} />
                       Pending
                     </span>
-
                   </div>
 
                   <p className="text-gray-500 mt-1 flex items-center gap-2">
@@ -178,7 +192,6 @@ const MyBookings = () => {
                     Sports Facility
                   </p>
 
-                  {/* DETAILS */}
                   <div className="grid grid-cols-2 gap-4 mt-5">
 
                     <div className="bg-green-50 p-3 rounded-xl">
@@ -197,20 +210,7 @@ const MyBookings = () => {
 
                   </div>
 
-                  {/* SLOTS */}
-                  <div className="flex flex-wrap gap-2 mt-4">
-                    {booking.slots?.map((slot, i) => (
-                      <span
-                        key={i}
-                        className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm"
-                      >
-                        {slot}
-                      </span>
-                    ))}
-                  </div>
-
-                  {/* CANCEL BUTTON */}
-                  <div className="mt-6 flex justify-end">
+                  <div className="flex justify-end mt-6">
                     <button
                       onClick={() => {
                         setSelectedBooking(booking);
@@ -227,18 +227,17 @@ const MyBookings = () => {
               </div>
             </div>
           ))}
+
         </div>
       </div>
 
-      {/* ================= DELETE MODAL ================= */}
+      {/* MODAL */}
       {showDeleteModal && selectedBooking && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
 
           <div className="bg-white w-[90%] max-w-md rounded-3xl shadow-2xl overflow-hidden">
 
-            {/* HEADER */}
             <div className="flex justify-between p-5 border-b">
-
               <div className="flex items-center gap-2">
                 <AlertTriangle className="text-red-500" />
                 <div>
@@ -251,27 +250,20 @@ const MyBookings = () => {
                 </div>
               </div>
 
-              <button
-                onClick={() => setShowDeleteModal(false)}
-                className="text-gray-400 hover:text-gray-600"
-              >
+              <button onClick={() => setShowDeleteModal(false)}>
                 <X />
               </button>
-
             </div>
 
-            {/* BODY */}
             <div className="p-6">
 
               <p className="text-gray-600">
                 Are you sure you want to cancel{" "}
                 <span className="font-semibold">
                   {selectedBooking.facilityName}
-                </span>
-                ?
+                </span>?
               </p>
 
-              {/* ACTIONS */}
               <div className="flex gap-3 mt-8">
 
                 <button

@@ -15,10 +15,8 @@ const AddSportFacilityForm = () => {
 
     const facilities = Object.fromEntries(formData.entries());
 
-    // ✅ override with logged-in user email
+    // ✅ auto add logged-in email
     facilities.ownerEmail = user?.email;
-
-    console.log("Submitted Data:", facilities);
 
     try {
       const res = await fetch("http://localhost:8080/facilities", {
@@ -29,9 +27,6 @@ const AddSportFacilityForm = () => {
         body: JSON.stringify(facilities),
       });
 
-      const data = await res.json();
-      console.log(data);
-
       if (res.ok) {
         form.reset();
         alert("Facility added successfully!");
@@ -39,7 +34,7 @@ const AddSportFacilityForm = () => {
         alert("Failed to add facility");
       }
     } catch (error) {
-      console.error("Error:", error);
+      console.error(error);
       alert("Something went wrong");
     }
   };
@@ -47,16 +42,19 @@ const AddSportFacilityForm = () => {
   return (
     <div className="mx-auto max-w-7xl bg-[#F5F5F5] px-6 py-10">
       <div>
-        <h1 className="mb-10 text-2xl font-bold">
+        {/* TITLE */}
+        <h1 className="mb-10 text-2xl font-bold text-gray-800">
           Add Sport Facilities
         </h1>
 
-        <div className="mx-auto w-3xl rounded-none border border-[#E5E5E5] bg-white px-10 py-8 shadow-sm">
+        {/* CARD */}
+        <div className="mx-auto w-3xl bg-white rounded-2xl border border-gray-100 px-10 py-8 shadow-sm">
+
           <form onSubmit={onSubmit} className="space-y-6">
 
             {/* Facility Name */}
             <div>
-              <label className="mb-2 block text-[13px] font-medium">
+              <label className="mb-2 block text-sm font-medium text-gray-700">
                 Facility Name
               </label>
               <input
@@ -64,18 +62,18 @@ const AddSportFacilityForm = () => {
                 type="text"
                 required
                 placeholder="Elite Sports Arena"
-                className="h-[46px] w-full rounded-[2px] border border-[#E5E5E5] bg-[#F8F8F8] px-4 text-[14px]"
+                className="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
               />
             </div>
 
             {/* Facility Type */}
             <div>
-              <label className="mb-2 block text-[13px] font-medium">
+              <label className="mb-2 block text-sm font-medium text-gray-700">
                 Facility Type
               </label>
               <select
                 name="facilityType"
-                className="h-[46px] w-full rounded-[2px] border border-[#E5E5E5] bg-[#F8F8F8] px-4 text-[14px]"
+                className="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
               >
                 <option value="Football Field">Football Field</option>
                 <option value="Basketball Court">Basketball Court</option>
@@ -87,87 +85,91 @@ const AddSportFacilityForm = () => {
 
             {/* Image */}
             <div>
-              <label className="mb-2 block text-[13px] font-medium">
+              <label className="mb-2 block text-sm font-medium text-gray-700">
                 Image URL
               </label>
               <input
                 name="image"
                 type="text"
                 required
-                className="h-[46px] w-full rounded-[2px] border px-4 text-[14px]"
+                className="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
               />
             </div>
 
             {/* Location */}
             <div>
-              <label className="mb-2 block text-[13px] font-medium">
+              <label className="mb-2 block text-sm font-medium text-gray-700">
                 Location
               </label>
               <input
                 name="location"
                 type="text"
                 required
-                className="h-[46px] w-full rounded-[2px] border px-4 text-[14px]"
+                className="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
               />
             </div>
 
-            {/* Price + Capacity */}
+            {/* PRICE + CAPACITY */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+
               <input
                 name="pricePerHour"
                 type="number"
                 placeholder="Price Per Hour"
-                className="h-[46px] border px-4 rounded-[2px]"
+                className="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
               />
 
               <input
                 name="capacity"
                 type="number"
                 placeholder="Capacity"
-                className="h-[46px] border px-4 rounded-[2px]"
+                className="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
               />
+
             </div>
 
-            {/* Slots */}
+            {/* SLOTS */}
             <div>
               <input
                 name="timeSlots"
-                placeholder="Time slots"
-                className="h-[46px] w-full border px-4 rounded-[2px]"
+                placeholder="Time slots (e.g. 10:00-12:00)"
+                className="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
               />
             </div>
 
-            {/* Description */}
+            {/* DESCRIPTION */}
             <textarea
               name="description"
               rows={4}
-              className="w-full border p-4 rounded-[2px]"
+              placeholder="Write facility description..."
+              className="w-full rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
             />
 
-            {/* OWNER EMAIL (AUTO) */}
+            {/* OWNER EMAIL */}
             <div>
-              <label className="mb-2 block text-[13px] font-medium">
+              <label className="mb-2 block text-sm font-medium text-gray-700">
                 Owner Email
               </label>
               <input
                 type="email"
                 value={user?.email || ""}
                 readOnly
-                className="h-[46px] w-full bg-gray-100 border px-4 rounded-[2px]"
+                className="h-11 w-full rounded-xl border border-gray-200 bg-gray-100 px-4 text-sm text-gray-500"
               />
             </div>
 
-            {/* BUTTONS */}
-            <div className="flex justify-end gap-4 pt-4">
+            {/* BUTTON */}
+            <div className="flex justify-end pt-4">
               <button
                 type="submit"
-                className="h-[44px] bg-green-600 text-white px-6 rounded-[2px]"
+                className="h-11 px-6 rounded-xl bg-green-600 hover:bg-green-700 text-white font-medium transition"
               >
                 Add Facility
               </button>
             </div>
 
           </form>
+
         </div>
       </div>
     </div>
