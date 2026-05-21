@@ -7,13 +7,15 @@ const DetailsPage = async ({ params }) => {
     const { id } = await params;
 
 
-    const res = await fetch(
-        `http://localhost:8080/facilities/${id}`,
-        {
-
+   const res = await fetch(
+    `http://localhost:8080/facilities/${id}`,
+    {
+        headers: {
+            authorization: "logged in"
         },
-        { cache: "no-store" }
-    );
+        cache: "no-store"
+    }
+);
 
     if (!res.ok) {
         return (
