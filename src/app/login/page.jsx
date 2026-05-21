@@ -49,15 +49,17 @@ export default function SignInPage() {
     }
   };
 
-  const handleGoogleSignIn = async () => {
-    try {
-      await authClient.signIn.social({ provider: "google" });
-      toast.success("Google login successful 🎉");
-      setTimeout(() => router.push("/"), 800);
-    } catch {
-      toast.error("Google login failed ❌");
-    }
-  };
+  const handleGoogleSignin = async () => {
+  try {
+    await authClient.signIn.social({
+      provider: "google",
+      callbackURL: "/",
+    });
+  } catch (error) {
+    console.error(error);
+    toast.error("Google sign-in failed");
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 via-white to-emerald-100 px-6 py-16">
@@ -167,20 +169,21 @@ export default function SignInPage() {
         </div>
 
         {/* GOOGLE */}
-        <button
-          onClick={handleGoogleSignIn}
-          className="
-            w-full h-12
-            flex items-center justify-center gap-3
-            border border-emerald-200
-            rounded-xl
-            bg-white hover:bg-emerald-50
-            transition shadow-sm font-medium
-          "
-        >
-          <FaGoogle className="text-red-500" />
-          Continue with Google
-        </button>
+       <button
+  type="button"
+  onClick={handleGoogleSignin}
+  className="
+    w-full h-12
+    flex items-center justify-center gap-3
+    border border-emerald-200
+    rounded-xl
+    bg-white hover:bg-emerald-50
+    transition shadow-sm font-medium
+  "
+>
+  <FaGoogle className="text-red-500" />
+  Continue with Google
+</button>
 
       </Card>
     </div>
