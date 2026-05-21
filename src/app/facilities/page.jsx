@@ -23,7 +23,7 @@ const AllFacilities = () => {
 
     try {
       const res = await fetch(
-        `http://localhost:8080/facilities?search=${encodeURIComponent(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/facilities?search=${encodeURIComponent(
           searchVal
         )}&type=${encodeURIComponent(typeVal)}`,
         { cache: "no-store" }

@@ -35,10 +35,19 @@ const MyBookings = () => {
 
     const fetchBookings = async () => {
       try {
+        const { data: tokenData } = await authClient.token();
+
         const res = await fetch(
-          `http://localhost:8080/bookings/${user.id}`
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/bookings/${user.id}`,
+          {
+            headers: {
+              authorization: `Bearer ${tokenData?.token}`,
+            },
+          }
         );
+
         const data = await res.json();
+
         setBookings(data);
       } catch (err) {
         console.log(err);
@@ -57,14 +66,24 @@ const MyBookings = () => {
     try {
       setLoadingId(selectedBooking._id);
 
+      const { data: tokenData } = await authClient.token();
+
       const res = await fetch(
-        `http://localhost:8080/booking/${selectedBooking._id}`,
-        { method: "DELETE" }
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/booking/${selectedBooking._id}`,
+        {
+          method: "DELETE",
+          headers: {
+            "content-type": "application/json",
+            authorization: `Bearer ${tokenData?.token}`,
+          },
+        }
       );
 
       const data = await res.json();
 
-      if (!res.ok) throw new Error(data?.message || "Delete failed");
+      if (!res.ok) {
+        throw new Error(data?.message || "Delete failed");
+      }
 
       setBookings((prev) =>
         prev.filter((b) => b._id !== selectedBooking._id)
@@ -91,12 +110,11 @@ const MyBookings = () => {
     );
   }
 
-  // ================= EMPTY STATE =================
+  // EMPTY STATE
   if (bookings.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-green-100 px-6">
         <div className="text-center max-w-md bg-white shadow-xl rounded-3xl p-10 border border-green-100">
-
           <div className="flex justify-center mb-5">
             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
               <CalendarX className="text-green-600 w-10 h-10" />
@@ -108,7 +126,8 @@ const MyBookings = () => {
           </h2>
 
           <p className="text-gray-500 mt-2">
-            You haven’t booked any facilities yet. Start exploring and book your first game!
+            You haven’t booked any facilities yet. Start exploring and book
+            your first game!
           </p>
 
           <Link href="/facilities">
@@ -116,7 +135,6 @@ const MyBookings = () => {
               Explore Facilities
             </button>
           </Link>
-
         </div>
       </div>
     );
@@ -124,7 +142,6 @@ const MyBookings = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-green-100 py-12 px-6">
-
       <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8">
 
         {/* USER PANEL */}
@@ -166,7 +183,6 @@ const MyBookings = () => {
               key={booking._id}
               className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden"
             >
-
               <div className="flex flex-col md:flex-row">
 
                 <img
@@ -240,10 +256,12 @@ const MyBookings = () => {
             <div className="flex justify-between p-5 border-b">
               <div className="flex items-center gap-2">
                 <AlertTriangle className="text-red-500" />
+
                 <div>
                   <h2 className="text-lg font-bold">
                     Cancel Booking
                   </h2>
+
                   <p className="text-sm text-gray-500">
                     This action cannot be undone
                   </p>

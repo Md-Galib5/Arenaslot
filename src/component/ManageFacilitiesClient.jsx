@@ -59,7 +59,7 @@ const ManageFacilitiesClient = ({ initialData }) => {
     try {
 
       const res = await fetch(
-        `http://localhost:8080/facilities/${selectedFacility._id}`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/facilities/${selectedFacility._id}`,
         {
           method: "DELETE",
         }
@@ -130,7 +130,7 @@ const ManageFacilitiesClient = ({ initialData }) => {
     try {
 
       const res = await fetch(
-  `http://localhost:8080/facilities/${editFacility._id}`,
+  `${process.env.NEXT_PUBLIC_SERVER_URL}/facilities/${editFacility._id}`,
   {
     method: "PATCH",
     headers: {

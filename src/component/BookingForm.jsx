@@ -110,7 +110,7 @@ const BookingForm = ({
       setLoading(true);
 
       // API CALL
-      const res = await fetch("http://localhost:8080/bookings", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/bookings`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

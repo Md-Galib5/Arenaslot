@@ -16,7 +16,7 @@ const FeaturedFacilities = () => {
   useEffect(() => {
     const fetchFacilities = async () => {
       try {
-        const res = await fetch("http://localhost:8080/facilities");
+        const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/facilities`);
         const data = await res.json();
         setFacilities(data);
       } catch (err) {

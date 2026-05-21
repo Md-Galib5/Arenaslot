@@ -1,162 +1,146 @@
 import BookingForm from "@/component/BookingForm";
+import { auth } from "@/lib/auth";
 import Image from "next/image";
 import Link from "next/link";
+import { headers } from "next/headers";
 
 const DetailsPage = async ({ params }) => {
+  const { id } = params;
 
-    const { id } = await params;
+  // ✅ get session instead of token (server-safe)
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
+  const user = session?.user;
 
-   const res = await fetch(
-    `http://localhost:8080/facilities/${id}`,
+  // ⚠️ IMPORTANT:
+  // Only send token if your backend REALLY requires it
+  const token = session?.session?.token;
+
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/facilities/${id}`,
     {
-        headers: {
-            authorization: "logged in"
-        },
-        cache: "no-store"
+      headers: token
+        ? {
+            authorization: `Bearer ${token}`,
+          }
+        : {},
+      cache: "no-store",
     }
-);
+  );
 
-    if (!res.ok) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <h1 className="text-xl font-semibold text-red-500">
-                    Failed to load facility
-                </h1>
-            </div>
-        );
-    }
-
-    const facility = await res.json();
-
-    if (!facility) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <h1 className="text-xl font-semibold text-red-500">
-                    Facility Not Found
-                </h1>
-            </div>
-        );
-    }
-
-    const {
-        facilityName,
-        facilityType,
-        image,
-        location,
-        pricePerHour,
-        capacity,
-        description,
-        timeSlots: availableSlots,
-    } = facility;
-
-    const slotsArray = Array.isArray(availableSlots)
-        ? availableSlots
-        : typeof availableSlots === "string"
-            ? availableSlots.split(",")
-            : [];
-
+  if (!res.ok) {
     return (
+      <div className="min-h-screen flex items-center justify-center">
+        <h1 className="text-xl font-semibold text-red-500">
+          Failed to load facility
+        </h1>
+      </div>
+    );
+  }
 
-        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-10">
+  const facility = await res.json();
 
-            <div className="w-11/12 max-w-6xl mx-auto">
-                <Link
-                    href="/facilities"
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-green-500 text-white text-sm font-semibold shadow-sm hover:bg-green-600 hover:shadow-md hover:-translate-x-1 transition-all duration-200"
-                >
-                    <span className="text-lg leading-none">
-                        ←
-                    </span>
-                    Back to Facilities
-                </Link>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch mt-5">
-                    <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+  if (!facility) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <h1 className="text-xl font-semibold text-red-500">
+          Facility Not Found
+        </h1>
+      </div>
+    );
+  }
 
-   
-                        <div className="relative w-full h-[260px] sm:h-[420px]">
-                            <Image
-                                src={image}
-                                alt={facilityName}
-                                fill
-                                className="object-cover"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
-                        </div>
+  const {
+    facilityName,
+    facilityType,
+    image,
+    location,
+    pricePerHour,
+    capacity,
+    description,
+    timeSlots: availableSlots,
+  } = facility;
 
+  const slotsArray = Array.isArray(availableSlots)
+    ? availableSlots
+    : typeof availableSlots === "string"
+    ? availableSlots.split(",")
+    : [];
 
-                        <div className="p-7 sm:p-10 space-y-7 flex-1">
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-10">
+      <div className="w-11/12 max-w-6xl mx-auto">
 
-                            <div>
-                                <span className="inline-block bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full">
-                                    {facilityType}
-                                </span>
+        <Link
+          href="/facilities"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-green-500 text-white text-sm font-semibold"
+        >
+          ← Back to Facilities
+        </Link>
 
-                                <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mt-3">
-                                    {facilityName}
-                                </h1>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-5">
 
-                                <div className="flex flex-wrap gap-4 mt-4 text-gray-500 text-sm">
-                                    <p>📍 {location}</p>
-                                    <p>👥 {capacity} people</p>
-                                </div>
-                            </div>
+          {/* IMAGE + DETAILS */}
+          <div className="bg-white rounded-3xl shadow-sm border overflow-hidden flex flex-col">
 
-                            <div className="bg-green-50 border border-green-100 rounded-2xl p-5 flex items-center justify-between">
-                                <div>
-                                    <p className="text-sm text-gray-500">Price</p>
-                                    <p className="text-xs text-gray-400">per hour</p>
-                                </div>
-                                <div className="text-3xl font-bold text-green-600">
-                                    ${pricePerHour}
-                                </div>
-                            </div>
-
-                            <div>
-                                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                                    About this facility
-                                </h3>
-                                <p className="text-gray-600 text-sm leading-relaxed">
-                                    {description}
-                                </p>
-                            </div>
-
-                            <div>
-                                <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                                    Available slots
-                                </h3>
-
-                                <div className="flex flex-wrap gap-2">
-                                    {slotsArray.map((slot, index) => (
-                                        <span
-                                            key={index}
-                                            className="px-3 py-1.5 rounded-full text-sm bg-gray-100 text-gray-700 border border-gray-200 hover:bg-green-50 hover:text-green-700 transition"
-                                        >
-                                            {slot.trim()}
-                                        </span>
-                                    ))}
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <div className="h-full">
-                        <BookingForm
-                            facility={facility}
-                            image={image}
-                            facilityName={facilityName}
-                            pricePerHour={pricePerHour}
-                            slotsArray={slotsArray}
-                        />
-                    </div>
-
-                </div>
-
+            <div className="relative w-full h-[260px] sm:h-[420px]">
+              <Image
+                src={image}
+                alt={facilityName}
+                fill
+                className="object-cover"
+              />
             </div>
+
+            <div className="p-7 space-y-6">
+
+              <span className="bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full">
+                {facilityType}
+              </span>
+
+              <h1 className="text-3xl font-bold">{facilityName}</h1>
+
+              <p className="text-gray-500">
+                📍 {location} • 👥 {capacity} people
+              </p>
+
+              <div className="text-3xl font-bold text-green-600">
+                ${pricePerHour} / hour
+              </div>
+
+              <p className="text-gray-600">{description}</p>
+
+              <div className="flex flex-wrap gap-2">
+                {slotsArray.map((slot, i) => (
+                  <span
+                    key={i}
+                    className="px-3 py-1 bg-gray-100 rounded-full text-sm"
+                  >
+                    {slot.trim()}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* BOOKING FORM */}
+          <div>
+            <BookingForm
+              facility={facility}
+              image={image}
+              facilityName={facilityName}
+              pricePerHour={pricePerHour}
+              slotsArray={slotsArray}
+              user={user}
+            />
+          </div>
 
         </div>
-    );
+      </div>
+    </div>
+  );
 };
 
 export default DetailsPage;

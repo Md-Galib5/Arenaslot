@@ -19,7 +19,7 @@ const AddSportFacilityForm = () => {
     facilities.ownerEmail = user?.email;
 
     try {
-      const res = await fetch("http://localhost:8080/facilities", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/facilities`, {
         method: "POST",
         headers: {
           "content-type": "application/json",

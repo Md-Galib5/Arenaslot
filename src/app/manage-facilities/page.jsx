@@ -2,7 +2,7 @@ import ManageFacilitiesClient from "@/component/ManageFacilitiesClient";
 
 
 const ManagePage = async () => {
-  const res = await fetch("http://localhost:8080/facilities", {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/facilities`, {
     cache: "no-store",
   });
 
