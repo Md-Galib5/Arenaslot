@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 
 const BookingForm = ({
   facility,
+  image,
   facilityName,
   pricePerHour,
   slotsArray,
@@ -90,9 +91,12 @@ const BookingForm = ({
     const bookingData = {
       facilityId: facility?._id,
       facilityName,
+        image,
       bookingDate,
       slots: selectedSubSlots,
+      hours: selectedSubSlots.length,
       totalPrice,
+      userId: user?.id,
       userEmail: user?.email,
       userName: user?.name,
       userImage: user?.image,
