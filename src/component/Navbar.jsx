@@ -58,6 +58,7 @@ const Navbar = () => {
                         ["My Bookings", "/my-bookings"],
                         ["Add Facilities", "/add-facilities"],
                         ["Manage Facilities", "/manage-facilities"],
+                        //  ["Manage Facilities", "/my-facilities"],
                     ].map(([label, path]) => (
                         <li key={path}>
                             <Link

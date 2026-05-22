@@ -25,9 +25,6 @@ const AllFacilities = () => {
         if (type) query.set("type", type);
 
         const url = `${baseUrl}/facilities?${query.toString()}`;
-
-        console.log("FETCH URL:", url); // 👈 IMPORTANT DEBUG
-
         const res = await fetch(url);
 
         const data = await res.json();

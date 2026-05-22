@@ -1,12 +1,39 @@
 import ManageFacilitiesClient from "@/component/ManageFacilitiesClient";
-
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import Link from "next/link";
+import { PlusCircle } from "lucide-react";
 
 const ManagePage = async () => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/facilities`, {
-    cache: "no-store",
+  const session = await auth.api.getSession({
+    headers: await headers(),
   });
 
-  const facilities = await res.json();
+  const user = session?.user;
+
+  if (!user) {
+    return (
+      <div className="p-10 text-center text-red-500">
+        Please login to view your facilities
+      </div>
+    );
+  }
+
+  const token = await auth.api.getToken({
+    headers: await headers(),
+  });
+
+  const facilityRes = await fetch(
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/facilities?ownerEmail=${user.email}`,
+    {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+      cache: "no-store",
+    }
+  );
+
+  const facilities = await facilityRes.json();
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -22,8 +49,32 @@ const ManagePage = async () => {
           </p>
         </div>
 
-        {/* CLIENT COMPONENT */}
-        <ManageFacilitiesClient initialData={facilities} />
+        {/* EMPTY STATE */}
+        {facilities.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 text-center bg-white rounded-2xl border border-gray-200 shadow-sm">
+            
+            <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mb-4">
+              <PlusCircle className="text-green-600" size={28} />
+            </div>
+
+            <h2 className="text-xl font-semibold text-gray-800">
+              No Facilities Yet
+            </h2>
+
+            <p className="text-gray-500 mt-2 max-w-md">
+              You haven’t added any sports facilities yet. Start by creating your first facility and manage it here.
+            </p>
+
+            <Link
+              href="/add-facilities"
+              className="mt-6 px-5 py-2.5 rounded-xl bg-green-600 text-white font-medium hover:bg-green-700 transition"
+            >
+              + Add Facility
+            </Link>
+          </div>
+        ) : (
+          <ManageFacilitiesClient initialData={facilities} />
+        )}
 
       </div>
     </div>
