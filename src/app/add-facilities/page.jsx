@@ -2,6 +2,7 @@
 
 import React from "react";
 import { authClient } from "@/lib/auth-client";
+import { toast } from "react-toastify";
 
 const AddSportFacilityForm = () => {
   const session = authClient.useSession();
@@ -29,7 +30,7 @@ const AddSportFacilityForm = () => {
 
       if (res.ok) {
         form.reset();
-        alert("Facility added successfully!");
+        toast.success("Facility added successfully!");
       } else {
         alert("Failed to add facility");
       }

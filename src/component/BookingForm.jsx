@@ -21,42 +21,50 @@ const BookingForm = ({
 
   // TIME HELPERS
   const toMinutes = (t) => {
-    const [h, m] = t.split(":").map(Number);
+    if (!t || typeof t !== "string") return 0;
+
+    const parts = t.split(":");
+    if (parts.length !== 2) return 0;
+
+    const [h, m] = parts.map(Number);
     return h * 60 + m;
   };
 
   const toTime = (mins) => {
     const h = String(Math.floor(mins / 60)).padStart(2, "0");
     const m = String(mins % 60).padStart(2, "0");
-
     return `${h}:${m}`;
   };
 
-  // EXPAND SLOT INTO 1 HOUR SLOTS
+  // EXPAND SLOT (FIXED SPLIT LOGIC)
   const expandedSlots = useMemo(() => {
     if (!selectedSlot) return [];
 
-    const [startStr, endStr] = selectedSlot
-      .split("-")
-      .map((s) => s.trim());
+    const parts = selectedSlot.split("-");
 
-    let start = toMinutes(startStr);
+    if (parts.length !== 2) return [];
+
+    const startStr = parts[0]?.trim();
+    const endStr = parts[1]?.trim();
+
+    const start = toMinutes(startStr);
     const end = toMinutes(endStr);
 
+    if (!startStr || !endStr || start >= end) return [];
+
     const result = [];
+    let current = start;
 
-    while (start + 60 <= end) {
-      const next = start + 60;
-
-      result.push(`${toTime(start)}-${toTime(next)}`);
-
-      start = next;
+    while (current + 60 <= end) {
+      const next = current + 60;
+      result.push(`${toTime(current)}-${toTime(next)}`);
+      current = next;
     }
 
     return result;
   }, [selectedSlot]);
 
-  // SELECT SLOT
+  // TOGGLE SLOT
   const toggleSlot = (slot) => {
     setSelectedSubSlots((prev) =>
       prev.includes(slot)
@@ -65,73 +73,56 @@ const BookingForm = ({
     );
   };
 
-  const totalPrice =
-    selectedSubSlots.length * Number(pricePerHour);
+  const totalPrice = selectedSubSlots.length * Number(pricePerHour || 0);
 
-  // BOOKING SUBMIT
+  // BOOKING
   const handleBooking = async () => {
-    // LOGIN CHECK
-    if (!user) {
-      toast.error("Please login first ❌");
-      return;
-    }
-
-    // DATE CHECK
-    if (!bookingDate) {
-      toast.error("Please select booking date ❌");
-      return;
-    }
-
-    // SLOT CHECK
-    if (selectedSubSlots.length === 0) {
-      toast.error("Please select at least one slot ❌");
-      return;
-    }
+    if (!user) return toast.error("Please login first ❌");
+    if (!bookingDate) return toast.error("Select booking date ❌");
+    if (selectedSubSlots.length === 0)
+      return toast.error("Select at least one slot ❌");
 
     const bookingData = {
-  facilityId: facility._id,
-  facilityName: facility.facilityName,
-  image: image,
-  bookingDate,
-  slots: selectedSubSlots,
-  hours: selectedSubSlots.length,
-  totalPrice,
-  userId: user?.id,
-  userEmail: user?.email,
-  userName: user?.name,
-  userImage: user?.image,
-};
-
-    console.log("BOOKING DATA:", bookingData);
+      facilityId: facility._id,
+      facilityName,
+      image,
+      bookingDate,
+      slots: selectedSubSlots,
+      hours: selectedSubSlots.length,
+      totalPrice,
+      userId: user?.id,
+      userEmail: user?.email,
+      userName: user?.name,
+      userImage: user?.image,
+    };
 
     const toastId = toast.loading("Booking facility...");
 
     try {
       setLoading(true);
 
-      // API CALL
-      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/bookings`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(bookingData),
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/bookings`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(bookingData),
+        }
+      );
 
       const data = await res.json();
 
       setLoading(false);
 
       if (!res.ok) {
-        toast.update(toastId, {
-          render:
-            data?.message || "Booking failed ❌",
+        return toast.update(toastId, {
+          render: data?.message || "Booking failed ❌",
           type: "error",
           isLoading: false,
           autoClose: 2000,
         });
-
-        return;
       }
 
       toast.update(toastId, {
@@ -141,14 +132,11 @@ const BookingForm = ({
         autoClose: 2000,
       });
 
-      // RESET
       setSelectedSlot("");
       setSelectedSubSlots([]);
       setBookingDate("");
-
     } catch (error) {
       console.log(error);
-
       setLoading(false);
 
       toast.update(toastId, {
@@ -165,10 +153,7 @@ const BookingForm = ({
 
       {/* HEADER */}
       <div className="bg-gradient-to-r from-green-500 to-emerald-600 p-6 text-white">
-        <h2 className="text-2xl font-bold">
-          Book Your Facility
-        </h2>
-
+        <h2 className="text-2xl font-bold">Book Your Facility</h2>
         <p className="text-green-100 text-sm mt-1">
           Select available slots and confirm your booking instantly
         </p>
@@ -197,9 +182,7 @@ const BookingForm = ({
           <input
             type="date"
             value={bookingDate}
-            onChange={(e) =>
-              setBookingDate(e.target.value)
-            }
+            onChange={(e) => setBookingDate(e.target.value)}
             className="mt-2 w-full h-12 px-4 rounded-xl border focus:ring-2 focus:ring-green-500 focus:outline-none"
           />
         </div>
@@ -218,10 +201,7 @@ const BookingForm = ({
               setSelectedSubSlots([]);
             }}
           >
-            <option value="">
-              Choose a slot
-            </option>
-
+            <option value="">Choose a slot</option>
             {slotsArray.map((slot, i) => (
               <option key={i} value={slot}>
                 {slot}
@@ -237,7 +217,6 @@ const BookingForm = ({
               <label className="text-sm font-medium text-gray-600">
                 Select Hours
               </label>
-
               <span className="text-xs text-gray-400">
                 Click to select multiple
               </span>
@@ -245,8 +224,7 @@ const BookingForm = ({
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {expandedSlots.map((slot, i) => {
-                const active =
-                  selectedSubSlots.includes(slot);
+                const active = selectedSubSlots.includes(slot);
 
                 return (
                   <button
@@ -271,20 +249,15 @@ const BookingForm = ({
         <div className="bg-gradient-to-r from-gray-50 to-gray-100 border rounded-2xl p-5 flex items-center justify-between">
 
           <div>
-            <p className="text-sm text-gray-500">
-              Total Price
-            </p>
-
+            <p className="text-sm text-gray-500">Total Price</p>
             <p className="text-xs text-gray-400">
-              {selectedSubSlots.length} hour(s)
-              selected
+              {selectedSubSlots.length} hour(s) selected
             </p>
           </div>
 
           <div className="text-3xl font-bold text-green-600">
             ${totalPrice}
           </div>
-
         </div>
       </div>
 
@@ -293,14 +266,10 @@ const BookingForm = ({
         <button
           type="button"
           onClick={handleBooking}
-          disabled={
-            selectedSubSlots.length === 0 || loading
-          }
+          disabled={selectedSubSlots.length === 0 || loading}
           className="w-full h-12 rounded-xl bg-green-500 hover:bg-green-600 disabled:bg-gray-300 text-white font-semibold transition-all shadow-md"
         >
-          {loading
-            ? "Processing..."
-            : "Confirm Booking"}
+          {loading ? "Processing..." : "Confirm Booking"}
         </button>
       </div>
     </div>

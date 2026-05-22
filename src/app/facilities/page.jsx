@@ -9,25 +9,26 @@ const AllFacilities = () => {
   const [search, setSearch] = useState("");
   const [type, setType] = useState("");
 
-  const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL;
-
   useEffect(() => {
     const fetchFacilities = async () => {
       try {
-        if (!baseUrl) return;
+        const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL;
+
+        if (!baseUrl) {
+          console.error("Missing NEXT_PUBLIC_SERVER_URL");
+          return;
+        }
 
         const query = new URLSearchParams();
 
-        if (search) query.set("search", search);
+        if (search.trim()) query.set("search", search.trim());
         if (type) query.set("type", type);
 
         const url = `${baseUrl}/facilities?${query.toString()}`;
 
-        const res = await fetch(url);
+        console.log("FETCH URL:", url); // 👈 IMPORTANT DEBUG
 
-        if (!res.ok) {
-          throw new Error("Failed to fetch facilities");
-        }
+        const res = await fetch(url);
 
         const data = await res.json();
 
@@ -39,12 +40,12 @@ const AllFacilities = () => {
     };
 
     fetchFacilities();
-  }, [search, type, baseUrl]);
+  }, [search, type]);
 
   return (
     <div className="w-11/12 mx-auto my-10 space-y-8">
 
-      {/* HEADER */}
+      {/* UI SAME */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
 
         <div>
@@ -57,41 +58,31 @@ const AllFacilities = () => {
           </p>
         </div>
 
-        {/* SEARCH + FILTER */}
         <div className="flex flex-col sm:flex-row gap-4">
 
-          {/* SEARCH */}
           <div className="relative">
-            <Search
-              size={18}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-            />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
 
             <input
-              type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search facility..."
-              className="pl-10 pr-4 py-3 border rounded-xl w-full sm:w-72 focus:ring-2 focus:ring-green-500 outline-none"
+              className="pl-10 pr-4 py-3 border rounded-xl w-full sm:w-72"
             />
           </div>
 
-          {/* FILTER */}
           <div className="relative">
-            <Filter
-              size={18}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-            />
+            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
 
             <select
               value={type}
               onChange={(e) => setType(e.target.value)}
-              className="pl-10 pr-4 py-3 border rounded-xl w-full sm:w-60 focus:ring-2 focus:ring-green-500 outline-none bg-white"
+              className="pl-10 pr-4 py-3 border rounded-xl w-full sm:w-60"
             >
               <option value="">All Types</option>
               <option value="Football Field">Football Field</option>
               <option value="Basketball Court">Basketball Court</option>
-              <option value="Cricket Ground">Cricket Ground</option>
+              <option value="Swimming Pool">Swimming Pool</option>
               <option value="Tennis Court">Tennis Court</option>
               <option value="Gym">Gym</option>
             </select>
@@ -102,7 +93,7 @@ const AllFacilities = () => {
 
       {/* LIST */}
       {facilities.length === 0 ? (
-        <div className="h-[300px] flex items-center justify-center border rounded-2xl bg-gray-50">
+        <div className="h-[300px] flex items-center justify-center">
           <p className="text-gray-500">No facilities found</p>
         </div>
       ) : (
@@ -112,7 +103,6 @@ const AllFacilities = () => {
           ))}
         </div>
       )}
-
     </div>
   );
 };
