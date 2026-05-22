@@ -3,28 +3,42 @@ import BookingForm from "@/component/BookingForm";
 import Image from "next/image";
 import Link from "next/link";
 
+import { auth } from '@/lib/auth';
+import { headers } from 'next/headers';
+
 const DetailsPage = async ({ params }) => {
     const { id } = await params;
-    console.log(id)
+    // console.log(id)
 
-    const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/facilities/${id}`,
-        {
-            cache: "no-store",
-        }
-    );
-
-    if (!res.ok) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <h1 className="text-xl font-semibold text-red-500">
-                    Failed to load facility
-                </h1>
-            </div>
-        );
-    }
-
+     const token = await auth.api.getToken({
+        headers: await headers()
+    });
+    const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/facilities/${id}`, {
+        headers: {
+            authorization: `Bearer ${token.token}`
+        },
+        cache: 'no-store',
+    });
     const facility = await res.json();
+
+    // const res = await fetch(
+    //     `${process.env.NEXT_PUBLIC_SERVER_URL}/facilities/${id}`,
+    //     {
+    //         cache: "no-store",
+    //     }
+    // );
+
+    // if (!res.ok) {
+    //     return (
+    //         <div className="min-h-screen flex items-center justify-center">
+    //             <h1 className="text-xl font-semibold text-red-500">
+    //                 Failed to load facility
+    //             </h1>
+    //         </div>
+    //     );
+    // }
+
+    // const facility = await res.json();
 
     if (!facility) {
         return (
