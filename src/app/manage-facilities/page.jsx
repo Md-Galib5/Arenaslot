@@ -19,16 +19,9 @@ const ManagePage = async () => {
     );
   }
 
-  const token = await auth.api.getToken({
-    headers: await headers(),
-  });
-
   const facilityRes = await fetch(
     `${process.env.NEXT_PUBLIC_SERVER_URL}/facilities?ownerEmail=${user.email}`,
     {
-      headers: {
-        authorization: `Bearer ${token}`,
-      },
       cache: "no-store",
     }
   );
