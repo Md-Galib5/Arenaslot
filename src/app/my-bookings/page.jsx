@@ -36,7 +36,7 @@ const MyBookings = () => {
         setLoading(true);
 
         const res = await fetch(
-          `http://localhost:8080/bookings/${user.id}`
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/bookings/${user.id}`
         );
 
         const data = await res.json();
@@ -59,7 +59,7 @@ const MyBookings = () => {
       setDeletingId(id);
 
       const res = await fetch(
-        `http://localhost:8080/booking/${id}`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/booking/${id}`,
         {
           method: "DELETE",
         }

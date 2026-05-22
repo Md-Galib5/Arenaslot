@@ -8,7 +8,7 @@ const DetailsPage = async ({ params }) => {
     console.log(id)
 
     const res = await fetch(
-        `http://localhost:8080/facilities/${id}`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/facilities/${id}`,
         {
             cache: "no-store",
         }
