@@ -2,7 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
-import IMG from "../../public/Assests/ChatGPT Image May 18, 2026, 03_10_12 AM.png";
+import IMG from "../../public/Assests/arenaslot-logo.png";
 
 import {
   Mail,

@@ -7,7 +7,7 @@ import React, { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Menu, X } from "lucide-react";
 
-import IMG from "../../public/Assests/ChatGPT Image May 18, 2026, 03_10_12 AM.png";
+import IMG from "../../public/Assests/arenaslot-logo.png";
 import { authClient } from "@/lib/auth-client";
 
 const Navbar = () => {
@@ -31,6 +31,7 @@ const Navbar = () => {
         <div className="bg-white py-3 border-b border-green-100 sticky top-0 z-50 shadow-sm">
             <nav className="flex items-center justify-between max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
+                {/* LEFT SIDE */}
                 <div className="flex items-center gap-3">
                     <button
                         onClick={() => setOpen(true)}
@@ -58,7 +59,6 @@ const Navbar = () => {
                         ["My Bookings", "/my-bookings"],
                         ["Add Facilities", "/add-facilities"],
                         ["Manage Facilities", "/manage-facilities"],
-                        //  ["Manage Facilities", "/my-facilities"],
                     ].map(([label, path]) => (
                         <li key={path}>
                             <Link
@@ -75,26 +75,26 @@ const Navbar = () => {
                     ))}
                 </ul>
 
-                {/* AUTH */}
+                {/* DESKTOP AUTH */}
                 <div className="hidden lg:flex items-center gap-3">
                     {user ? (
                         <>
                             <div className="flex items-center gap-2">
-        <Avatar className="w-8 h-8">
-            <Avatar.Image
-            className='rounded-xl'
-                src={user?.image}
-                referrerPolicy="no-referrer"
-            />
-            <Avatar.Fallback>
-                {user?.name?.[0] ?? "U"}
-            </Avatar.Fallback>
-        </Avatar>
+                                <Avatar className="w-8 h-8">
+                                    <Avatar.Image
+                                        className="rounded-xl"
+                                        src={user?.image}
+                                        referrerPolicy="no-referrer"
+                                    />
+                                    <Avatar.Fallback>
+                                        {user?.name?.[0] ?? "U"}
+                                    </Avatar.Fallback>
+                                </Avatar>
 
-        <span className="text-md font-semibold text-gray-700">
-            {user?.name ?? "User"}
-        </span>
-    </div>
+                                <span className="text-md font-semibold text-gray-700">
+                                    {user?.name ?? "User"}
+                                </span>
+                            </div>
 
                             <Button
                                 onClick={handleSignOut}
@@ -145,6 +145,7 @@ const Navbar = () => {
                         open ? "translate-x-0" : "-translate-x-full"
                     }`}
                 >
+                    {/* HEADER */}
                     <div className="flex items-center justify-between p-5 border-b border-green-100">
                         <Image src={IMG} alt="logo" width={140} height={140} />
                         <button onClick={() => setOpen(false)}>
@@ -152,6 +153,7 @@ const Navbar = () => {
                         </button>
                     </div>
 
+                    {/* LINKS */}
                     <div className="flex flex-col p-5 gap-5">
                         {[
                             ["Home", "/"],
@@ -174,18 +176,51 @@ const Navbar = () => {
                             </Link>
                         ))}
 
+                        {/* AUTH (FIXED) */}
                         <div className="pt-4 flex flex-col gap-3">
-                            <Link href="/login">
-                                <Button className="w-full bg-green-500 text-white p-1 rounded-md">
-                                    Login
-                                </Button>
-                            </Link>
 
-                            <Link href="/register">
-                                <Button className="w-full border border-green-300 text-green-600 p-1 rounded-md">
-                                    Register
-                                </Button>
-                            </Link>
+                            {user ? (
+                                <>
+                                    <div className="flex items-center gap-2 px-2">
+                                        <Avatar className="w-8 h-8">
+                                            <Avatar.Image
+                                                className="rounded-xl"
+                                                src={user?.image}
+                                                referrerPolicy="no-referrer"
+                                            />
+                                            <Avatar.Fallback>
+                                                {user?.name?.[0] ?? "U"}
+                                            </Avatar.Fallback>
+                                        </Avatar>
+
+                                        <span className="text-sm font-semibold text-gray-700">
+                                            {user?.name ?? "User"}
+                                        </span>
+                                    </div>
+
+                                    <Button
+                                        onClick={handleSignOut}
+                                        className="w-full bg-red-500 text-white p-1 rounded-md"
+                                    >
+                                        Sign Out
+                                    </Button>
+                                </>
+                            ) : (
+                                <>
+                                    <Link href="/login" onClick={() => setOpen(false)}>
+                                        <Button className="w-full bg-green-500 text-white p-1 rounded-md">
+                                            Login
+                                        </Button>
+                                    </Link>
+
+                                    <Link href="/register" onClick={() => setOpen(false)}>
+                                        <Button className="w-full border border-green-300 text-green-600 p-1 rounded-md">
+                                            Register
+                                        </Button>
+                                    </Link>
+                                </>
+                            )}
+
                         </div>
                     </div>
                 </div>

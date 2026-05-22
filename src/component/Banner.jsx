@@ -6,7 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 
-import IMG from "../../public/Assests/ChatGPT Image May 18, 2026, 03_27_01 AM.png";
+import IMG from "../../public/Assests/Banner.png";
 
 const Banner = () => {
 

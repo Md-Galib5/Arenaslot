@@ -16,7 +16,12 @@ const AddSportFacilityForm = () => {
 
     const facilities = Object.fromEntries(formData.entries());
 
-    facilities.ownerEmail = user?.email;
+    if (!user?.email) {
+      toast.error("You must be logged in");
+      return;
+    }
+
+    facilities.ownerEmail = user.email;
 
     try {
       const res = await fetch(
@@ -43,12 +48,18 @@ const AddSportFacilityForm = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F5F5] px-4 sm:px-6 lg:px-10 py-8 sm:py-12">
+    <div className="min-h-screen bg-[#F5F5F5] px-4 sm:px-6 lg:px-10 py-10">
 
-      {/* TITLE */}
-      <h1 className="mb-6 sm:mb-10 text-xl sm:text-2xl font-bold text-gray-800 text-center sm:text-left">
-        Add Sport Facility
-      </h1>
+      {/* PAGE HEADER (NOW PROPERLY ABOVE FORM) */}
+      <div className="max-w-3xl mx-auto mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
+          Add Sport Facility
+        </h1>
+
+        <p className="text-sm text-gray-500 mt-1">
+          Fill in the details below to list a new sports facility
+        </p>
+      </div>
 
       {/* FORM CARD */}
       <div className="mx-auto w-full max-w-3xl bg-white rounded-2xl border border-gray-100 px-5 sm:px-8 lg:px-10 py-8 shadow-sm">
@@ -114,7 +125,6 @@ const AddSportFacilityForm = () => {
 
           {/* PRICE + CAPACITY */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
-
             <input
               name="pricePerHour"
               type="number"
@@ -128,7 +138,6 @@ const AddSportFacilityForm = () => {
               placeholder="Capacity"
               className="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
             />
-
           </div>
 
           {/* TIME SLOTS */}
@@ -174,7 +183,6 @@ const AddSportFacilityForm = () => {
           </div>
 
         </form>
-
       </div>
     </div>
   );
