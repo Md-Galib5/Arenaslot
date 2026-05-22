@@ -1,169 +1,151 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import FacilitiesCard from "@/component/FacilitiesCard";
-import { Search, Filter, Sparkles } from "lucide-react";
+import { Search, Filter } from "lucide-react";
 
 const AllFacilities = () => {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
   const [facilities, setFacilities] = useState([]);
-  const [loading, setLoading] = useState(false);
 
   const [search, setSearch] = useState("");
-  const [type, setType] = useState("");
-
-  const fetchFacilities = async (searchVal, typeVal) => {
-    setLoading(true);
-
-    try {
-      const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL;
-
-      const url = `${baseUrl}/facilities?search=${encodeURIComponent(
-        searchVal || ""
-      )}&type=${encodeURIComponent(typeVal || "")}`;
-
-      const res = await fetch(url);
-      const data = await res.json();
-
-      setFacilities(data || []);
-    } catch (err) {
-      console.log(err);
-      setFacilities([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [filter, setFilter] = useState("");
 
   useEffect(() => {
-    const urlSearch = searchParams?.get("search") || "";
-    const urlType = searchParams?.get("type") || "";
+    const fetchFacilities = async () => {
+      try {
+        let url = "http://localhost:8080/facilities?";
 
-    setSearch(urlSearch);
-    setType(urlType);
+        // SEARCH
+        if (search) {
+          url += `search=${search}&`;
+        }
 
-    fetchFacilities(urlSearch, urlType);
-  }, [searchParams]);
+        // FILTER
+        if (filter) {
+          url += `type=${filter}`;
+        }
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+        const res = await fetch(url);
 
-    router.push(
-      `/facilities?search=${encodeURIComponent(search)}&type=${encodeURIComponent(type)}`
-    );
-  };
+        const data = await res.json();
+
+        setFacilities(data);
+
+      } catch (error) {
+        console.log(error);
+        setFacilities([]);
+      }
+    };
+
+    fetchFacilities();
+
+  }, [search, filter]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-emerald-50">
+    <div className="w-11/12 mx-auto my-10 space-y-8">
 
-      <div className="max-w-7xl mx-auto px-4 py-10">
+      {/* TOP */}
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
 
-        {/* HEADER */}
-        <div className="bg-white/70 backdrop-blur-xl border border-emerald-100 shadow-xl rounded-3xl p-6 md:p-8 mb-10">
+        <div>
+          <h1 className="text-4xl font-black bg-gradient-to-r from-green-600 to-emerald-500 bg-clip-text text-transparent">
+            All Facilities
+          </h1>
 
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <p className="text-gray-500 text-sm mt-1">
+            {facilities.length} facilit
+            {facilities.length !== 1 ? "ies" : "y"} available
+          </p>
+        </div>
 
-            <div>
-              <h1 className="text-3xl md:text-4xl font-extrabold text-gray-800 flex items-center gap-2">
-                <Sparkles className="text-emerald-500" />
-                All Facilities
-              </h1>
+        {/* SEARCH + FILTER */}
+        <div className="flex flex-col sm:flex-row gap-4">
 
-              <p className="text-gray-500 mt-1">
-                Find and book your favorite sports place easily
-              </p>
-            </div>
+          {/* SEARCH */}
+          <div className="relative">
 
-            <div className="flex gap-3 text-sm">
-              <div className="px-4 py-2 rounded-xl bg-emerald-100 text-emerald-700 font-medium">
-                {facilities.length} Available
-              </div>
+            <Search
+              size={18}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+            />
 
-              <div className="px-4 py-2 rounded-xl bg-gray-100 text-gray-600">
-                Live Search
-              </div>
-            </div>
+            <input
+              type="text"
+              placeholder="Search facility..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-10 pr-4 py-3 rounded-2xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500 w-full sm:w-72"
+            />
 
           </div>
 
-          {/* SEARCH + FILTER */}
-          <form
-            onSubmit={handleSubmit}
-            className="mt-6 grid grid-cols-1 md:grid-cols-12 gap-3"
-          >
+          {/* FILTER */}
+          <div className="relative">
 
-            {/* SEARCH */}
-            <div className="md:col-span-6 relative">
-              <Search className="absolute left-3 top-3.5 text-gray-400 w-5 h-5" />
+            <Filter
+              size={18}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+            />
 
-              <input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search by name, location..."
-                className="w-full pl-10 pr-4 py-3 rounded-2xl border border-gray-200 focus:ring-2 focus:ring-emerald-400 outline-none"
-              />
-            </div>
-
-            {/* FILTER */}
-            <div className="md:col-span-3 relative">
-              <Filter className="absolute left-3 top-3.5 text-gray-400 w-5 h-5" />
-
-              <select
-                value={type}
-                onChange={(e) => setType(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 rounded-2xl border border-gray-200 focus:ring-2 focus:ring-emerald-400 outline-none"
-              >
-                <option value="">All Sports</option>
-                <option value="Football Field">Football</option>
-                <option value="Basketball Court">Basketball</option>
-                <option value="Tennis Court">Tennis</option>
-                <option value="Swimming Pool">Swimming</option>
-                <option value="Gym">Gym</option>
-              </select>
-            </div>
-
-            {/* BUTTON */}
-            <button
-              type="submit"
-              className="md:col-span-3 bg-gradient-to-r from-emerald-500 to-green-500 text-white font-semibold rounded-2xl py-3 hover:scale-105 transition"
+            <select
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              className="pl-10 pr-4 py-3 rounded-2xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500 appearance-none bg-white w-full sm:w-60"
             >
-              Apply Filters
-            </button>
+              <option value="">
+                All Types
+              </option>
 
-          </form>
+              <option value="Football Field">
+                Football Field
+              </option>
+
+              <option value="Basketball Court">
+                Basketball Court
+              </option>
+
+              <option value="Cricket Ground">
+                Cricket Ground
+              </option>
+
+              <option value="Tennis Court">
+                Tennis Court
+              </option>
+
+              <option value="Gym">
+                Gym
+              </option>
+
+            </select>
+
+          </div>
 
         </div>
 
-        {/* LOADING */}
-        {loading && (
-          <div className="text-center py-20 text-gray-500">
-            Loading facilities...
-          </div>
-        )}
-
-        {/* GRID */}
-        {!loading && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-
-            {facilities.length > 0 ? (
-              facilities.map((facility) => (
-                <FacilitiesCard
-                  key={facility._id}
-                  facilities={facility}
-                />
-              ))
-            ) : (
-              <div className="col-span-full text-center text-gray-500">
-                No facilities found
-              </div>
-            )}
-
-          </div>
-        )}
-
       </div>
+
+      {/* EMPTY */}
+      {facilities.length === 0 ? (
+        <div className="h-[300px] flex items-center justify-center rounded-3xl border border-dashed border-gray-300 bg-gray-50">
+
+          <p className="text-gray-500 text-lg">
+            No facilities found
+          </p>
+
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">
+
+          {facilities.map((facility) => (
+            <FacilitiesCard
+              key={facility._id}
+              facility={facility}
+            />
+          ))}
+
+        </div>
+      )}
+
     </div>
   );
 };

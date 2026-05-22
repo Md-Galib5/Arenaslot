@@ -141,10 +141,12 @@ const DetailsPage = async ({ params }) => {
                     {/* Right Section */}
                     <div className="h-full">
                         <BookingForm
-                            facilityName={facilityName}
-                            pricePerHour={pricePerHour}
-                            slotsArray={slotsArray}
-                        />
+  facility={facility}
+  facilityName={facilityName}
+  image={image}
+  pricePerHour={pricePerHour}
+  slotsArray={slotsArray}
+/>
                     </div>
 
                 </div>

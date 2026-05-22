@@ -48,7 +48,7 @@ const BookingForm = ({
     while (start + 60 <= end) {
       const next = start + 60;
 
-      result.push(`${toTime(start)} - ${toTime(next)}`);
+      result.push(`${toTime(start)}-${toTime(next)}`);
 
       start = next;
     }
@@ -89,18 +89,18 @@ const BookingForm = ({
     }
 
     const bookingData = {
-      facilityId: facility?._id,
-      facilityName,
-        image,
-      bookingDate,
-      slots: selectedSubSlots,
-      hours: selectedSubSlots.length,
-      totalPrice,
-      userId: user?.id,
-      userEmail: user?.email,
-      userName: user?.name,
-      userImage: user?.image,
-    };
+  facilityId: facility._id,
+  facilityName: facility.facilityName,
+  image: image,
+  bookingDate,
+  slots: selectedSubSlots,
+  hours: selectedSubSlots.length,
+  totalPrice,
+  userId: user?.id,
+  userEmail: user?.email,
+  userName: user?.name,
+  userImage: user?.image,
+};
 
     console.log("BOOKING DATA:", bookingData);
 

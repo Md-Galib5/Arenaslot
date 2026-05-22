@@ -6,7 +6,8 @@ import Link from "next/link";
 
 import { MapPin, Users, ArrowRight, Sparkles } from "lucide-react";
 
-const FacilitiesCard = ({ facilities }) => {
+const FacilitiesCard = ({ facility }) => {
+  // console.log("FACILITIES:", facilities);
   const {
     _id,
     facilityName,
@@ -15,7 +16,7 @@ const FacilitiesCard = ({ facilities }) => {
     location,
     pricePerHour,
     capacity,
-  } = facilities;
+  } = facility;
 
   return (
     <div className="group relative overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">

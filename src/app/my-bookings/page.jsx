@@ -1,21 +1,22 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
 
 import {
   CalendarDays,
   Clock3,
-  MapPin,
-  Hourglass,
-  Mail,
   Trash2,
-  X,
-  AlertTriangle,
-  CalendarX,
+  Mail,
+  Sparkles,
+  Loader2,
+  MapPin,
+  BadgeCheck,
+  ArrowRight,
 } from "lucide-react";
 
-import Link from "next/link";
 import { toast } from "react-toastify";
 
 const MyBookings = () => {
@@ -24,10 +25,7 @@ const MyBookings = () => {
 
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedBooking, setSelectedBooking] = useState(null);
-  const [loadingId, setLoadingId] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
 
   // FETCH BOOKINGS
   useEffect(() => {
@@ -35,22 +33,18 @@ const MyBookings = () => {
 
     const fetchBookings = async () => {
       try {
-        const { data: tokenData } = await authClient.token();
+        setLoading(true);
 
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_SERVER_URL}/bookings/${user.id}`,
-          {
-            headers: {
-              authorization: `Bearer ${tokenData?.token}`,
-            },
-          }
+          `http://localhost:8080/bookings/${user.id}`
         );
 
         const data = await res.json();
 
-        setBookings(data);
+        setBookings(Array.isArray(data) ? data : []);
       } catch (err) {
-        console.log(err);
+        console.log("FETCH ERROR:", err);
+        setBookings([]);
       } finally {
         setLoading(false);
       }
@@ -59,23 +53,15 @@ const MyBookings = () => {
     fetchBookings();
   }, [user]);
 
-  // DELETE BOOKING
-  const handleDelete = async () => {
-    if (!selectedBooking) return;
-
+  // CANCEL BOOKING
+  const handleCancel = async (id) => {
     try {
-      setLoadingId(selectedBooking._id);
-
-      const { data: tokenData } = await authClient.token();
+      setDeletingId(id);
 
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/booking/${selectedBooking._id}`,
+        `http://localhost:8080/booking/${id}`,
         {
           method: "DELETE",
-          headers: {
-            "content-type": "application/json",
-            authorization: `Bearer ${tokenData?.token}`,
-          },
         }
       );
 
@@ -85,230 +71,283 @@ const MyBookings = () => {
         throw new Error(data?.message || "Delete failed");
       }
 
-      setBookings((prev) =>
-        prev.filter((b) => b._id !== selectedBooking._id)
-      );
+      setBookings((prev) => prev.filter((b) => b._id !== id));
 
-      setShowDeleteModal(false);
-      setSelectedBooking(null);
-
-      toast.success("Booking cancelled successfully ✅");
-    } catch (error) {
-      console.log(error);
-      toast.error("Failed to cancel booking ❌");
+      toast.success("Booking cancelled successfully");
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to cancel booking");
     } finally {
-      setLoadingId(null);
+      setDeletingId(null);
     }
   };
 
   // LOADING UI
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-100">
-        <div className="w-14 h-14 border-4 border-green-500 border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
-
-  // EMPTY STATE
-  if (bookings.length === 0) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-green-100 px-6">
-        <div className="text-center max-w-md bg-white shadow-xl rounded-3xl p-10 border border-green-100">
-          <div className="flex justify-center mb-5">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
-              <CalendarX className="text-green-600 w-10 h-10" />
-            </div>
-          </div>
-
-          <h2 className="text-2xl font-bold text-gray-800">
-            No Bookings Yet
-          </h2>
-
-          <p className="text-gray-500 mt-2">
-            You haven’t booked any facilities yet. Start exploring and book
-            your first game!
-          </p>
-
-          <Link href="/facilities">
-            <button className="mt-6 px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium">
-              Explore Facilities
-            </button>
-          </Link>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 to-green-100">
+        <Loader2 className="w-12 h-12 animate-spin text-green-600" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-green-100 py-12 px-6">
-      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-green-100 py-12 px-5">
 
-        {/* USER PANEL */}
-        <div className="lg:w-1/3 lg:sticky lg:top-10 h-fit">
-          <div className="bg-gradient-to-br from-green-600 to-emerald-700 text-white rounded-3xl shadow-2xl p-8 text-center">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-            <h2 className="text-sm uppercase tracking-widest opacity-80">
-              User Details
-            </h2>
+        {/* ================= USER PROFILE ================= */}
+        <div className="lg:sticky lg:top-10 h-fit">
 
-            <img
-              src={user?.image || "https://i.ibb.co/2kR1YkS/user.png"}
-              className="w-28 h-28 rounded-full border-4 border-white mx-auto mt-6 shadow-lg object-cover"
-            />
+          <div className="relative overflow-hidden rounded-[32px] bg-white border border-green-100 shadow-2xl">
 
-            <h3 className="text-2xl font-bold mt-4">
-              {user?.name}
-            </h3>
+            {/* TOP BG */}
+            <div className="h-32 bg-gradient-to-r from-green-600 via-emerald-500 to-green-400 relative">
 
-            <div className="flex items-center justify-center gap-2 mt-2 text-sm opacity-90">
-              <Mail size={16} />
-              {user?.email}
+              <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]" />
+
             </div>
 
-            <div className="mt-6 bg-white/10 rounded-2xl p-4">
-              <p className="text-sm opacity-80">Total Bookings</p>
-              <h2 className="text-3xl font-black">
-                {bookings.length}
-              </h2>
-            </div>
-          </div>
-        </div>
+            {/* PROFILE */}
+            <div className="px-6 pb-8 relative">
 
-        {/* BOOKINGS LIST */}
-        <div className="lg:w-2/3 space-y-6">
+              <div className="-mt-14 flex justify-center">
+                <div className="relative">
 
-          {bookings.map((booking) => (
-            <div
-              key={booking._id}
-              className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden"
-            >
-              <div className="flex flex-col md:flex-row">
+                  <Image
+                    src={user?.image || "/placeholder.jpg"}
+                    width={120}
+                    height={120}
+                    alt="user"
+                    className="w-28 h-28 rounded-full border-[6px] border-white shadow-xl object-cover"
+                  />
 
-                <img
-                  src={booking.image}
-                  className="w-full md:w-56 h-48 object-cover"
-                />
-
-                <div className="p-6 flex-1">
-
-                  <div className="flex justify-between">
-                    <h2 className="text-2xl font-bold text-gray-800">
-                      {booking.facilityName}
-                    </h2>
-
-                    <span className="px-3 py-1 bg-yellow-100 text-yellow-700 text-xs rounded-full flex items-center gap-1">
-                      <Hourglass size={14} />
-                      Pending
-                    </span>
-                  </div>
-
-                  <p className="text-gray-500 mt-1 flex items-center gap-2">
-                    <MapPin size={14} />
-                    Sports Facility
-                  </p>
-
-                  <div className="grid grid-cols-2 gap-4 mt-5">
-
-                    <div className="bg-green-50 p-3 rounded-xl">
-                      <CalendarDays size={16} className="text-green-600" />
-                      <p className="text-sm font-medium mt-1">
-                        {booking.bookingDate}
-                      </p>
-                    </div>
-
-                    <div className="bg-blue-50 p-3 rounded-xl">
-                      <Clock3 size={16} className="text-blue-600" />
-                      <p className="text-sm font-medium mt-1">
-                        {booking.hours} Hour(s)
-                      </p>
-                    </div>
-
-                  </div>
-
-                  <div className="flex justify-end mt-6">
-                    <button
-                      onClick={() => {
-                        setSelectedBooking(booking);
-                        setShowDeleteModal(true);
-                      }}
-                      className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-xl"
-                    >
-                      <Trash2 size={16} />
-                      Cancel Booking
-                    </button>
+                  <div className="absolute bottom-1 right-1 bg-green-500 p-1 rounded-full border-2 border-white">
+                    <BadgeCheck className="w-4 h-4 text-white" />
                   </div>
 
                 </div>
               </div>
-            </div>
-          ))}
 
-        </div>
-      </div>
+              <div className="text-center mt-4">
 
-      {/* MODAL */}
-      {showDeleteModal && selectedBooking && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                <h2 className="text-2xl font-black text-gray-800">
+                  {user?.name}
+                </h2>
 
-          <div className="bg-white w-[90%] max-w-md rounded-3xl shadow-2xl overflow-hidden">
+                <div className="flex items-center justify-center gap-2 mt-2 text-sm text-gray-500">
+                  <Mail size={15} />
+                  {user?.email}
+                </div>
 
-            <div className="flex justify-between p-5 border-b">
-              <div className="flex items-center gap-2">
-                <AlertTriangle className="text-red-500" />
+              </div>
 
-                <div>
-                  <h2 className="text-lg font-bold">
-                    Cancel Booking
+              {/* STATS */}
+              <div className="grid grid-cols-2 gap-4 mt-7">
+
+                <div className="bg-green-50 rounded-2xl p-4 text-center border border-green-100">
+                  <p className="text-xs text-gray-500 uppercase">
+                    Total
+                  </p>
+
+                  <h2 className="text-2xl font-black text-green-700">
+                    {bookings.length}
                   </h2>
 
-                  <p className="text-sm text-gray-500">
-                    This action cannot be undone
+                  <p className="text-xs text-gray-500">
+                    Bookings
                   </p>
                 </div>
-              </div>
 
-              <button onClick={() => setShowDeleteModal(false)}>
-                <X />
-              </button>
-            </div>
+                <div className="bg-emerald-50 rounded-2xl p-4 text-center border border-emerald-100">
+                  <Sparkles className="mx-auto text-emerald-600 mb-1" />
 
-            <div className="p-6">
-
-              <p className="text-gray-600">
-                Are you sure you want to cancel{" "}
-                <span className="font-semibold">
-                  {selectedBooking.facilityName}
-                </span>?
-              </p>
-
-              <div className="flex gap-3 mt-8">
-
-                <button
-                  onClick={() => setShowDeleteModal(false)}
-                  className="flex-1 h-12 border rounded-xl"
-                >
-                  Keep
-                </button>
-
-                <button
-                  onClick={handleDelete}
-                  disabled={loadingId === selectedBooking._id}
-                  className="flex-1 h-12 bg-red-500 text-white rounded-xl"
-                >
-                  {loadingId === selectedBooking._id
-                    ? "Cancelling..."
-                    : "Cancel Booking"}
-                </button>
+                  <p className="text-sm font-semibold text-emerald-700">
+                    Premium User
+                  </p>
+                </div>
 
               </div>
 
-            </div>
+              <Link href="/facilities">
+                <button className="mt-6 w-full bg-gradient-to-r from-green-600 to-emerald-500 hover:opacity-90 text-white py-3 rounded-2xl font-semibold flex items-center justify-center gap-2 shadow-lg transition">
 
+                  Explore Facilities
+
+                  <ArrowRight size={18} />
+
+                </button>
+              </Link>
+
+            </div>
           </div>
         </div>
-      )}
 
+        {/* ================= BOOKINGS SECTION ================= */}
+        <div className="lg:col-span-2 space-y-6">
+
+          {/* EMPTY */}
+          {bookings.length === 0 ? (
+            <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-14 text-center">
+
+              <div className="w-24 h-24 rounded-full bg-green-100 flex items-center justify-center mx-auto">
+                <CalendarDays className="w-10 h-10 text-green-600" />
+              </div>
+
+              <h2 className="text-2xl font-bold text-gray-800 mt-6">
+                No Bookings Yet
+              </h2>
+
+              <p className="text-gray-500 mt-2">
+                Book your favorite sports facility and start playing.
+              </p>
+
+              <Link href="/facilities">
+                <button className="mt-6 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-2xl font-medium">
+                  Browse Facilities
+                </button>
+              </Link>
+
+            </div>
+          ) : (
+            bookings.map((b) => (
+              <div
+                key={b._id}
+                className="group relative overflow-hidden rounded-[30px] bg-white border border-gray-100 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-1"
+              >
+
+                <div className="flex flex-col md:flex-row">
+
+                  {/* IMAGE */}
+                  <div className="relative md:w-[320px] h-[250px] overflow-hidden">
+
+                    <Image
+                      src={b.image || "/placeholder.jpg"}
+                      alt={b.facilityName}
+                      fill
+                      className="object-cover group-hover:scale-110 transition duration-700"
+                    />
+
+                    {/* OVERLAY */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+
+                    {/* BADGE */}
+                    <div className="absolute top-4 left-4">
+
+                      <span className="bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-bold text-green-700 shadow">
+                        Confirmed
+                      </span>
+
+                    </div>
+
+                    {/* PRICE */}
+                    <div className="absolute bottom-4 right-4 bg-green-600 text-white px-4 py-2 rounded-2xl shadow-xl">
+
+                      <p className="text-xs opacity-80">
+                        Total Price
+                      </p>
+
+                      <h2 className="font-black text-lg">
+                        ${b.totalPrice}
+                      </h2>
+
+                    </div>
+
+                  </div>
+
+                  {/* CONTENT */}
+                  <div className="flex-1 p-7">
+
+                    <div className="flex items-start justify-between gap-4">
+
+                      <div>
+                        <h2 className="text-2xl font-black text-gray-800 group-hover:text-green-600 transition">
+                          {b.facilityName}
+                        </h2>
+
+                        <div className="flex items-center gap-2 text-sm text-gray-500 mt-2">
+                          <MapPin size={15} />
+                          Sports Facility Booking
+                        </div>
+                      </div>
+
+                    </div>
+
+                    {/* INFO CARDS */}
+                    <div className="grid grid-cols-2 gap-4 mt-6">
+
+                      <div className="bg-green-50 border border-green-100 rounded-2xl p-4">
+                        <div className="flex items-center gap-2 text-green-700">
+                          <CalendarDays size={18} />
+                          <p className="text-sm font-semibold">
+                            Booking Date
+                          </p>
+                        </div>
+
+                        <p className="mt-2 text-gray-700 font-medium">
+                          {b.bookingDate}
+                        </p>
+                      </div>
+
+                      <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-4">
+                        <div className="flex items-center gap-2 text-emerald-700">
+                          <Clock3 size={18} />
+                          <p className="text-sm font-semibold">
+                            Duration
+                          </p>
+                        </div>
+
+                        <p className="mt-2 text-gray-700 font-medium">
+                          {b.hours} Hour(s)
+                        </p>
+                      </div>
+
+                    </div>
+
+                    {/* SLOT */}
+                    <div className="mt-5">
+                      <p className="text-sm text-gray-500 mb-2">
+                        Time Slots
+                      </p>
+
+                      <div className="flex flex-wrap gap-2">
+
+                        {b.slots?.map((slot, index) => (
+                          <span
+                            key={index}
+                            className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm font-medium"
+                          >
+                            {slot}
+                          </span>
+                        ))}
+
+                      </div>
+                    </div>
+
+                    {/* BUTTON */}
+                    <button
+                      onClick={() => handleCancel(b._id)}
+                      disabled={deletingId === b._id}
+                      className="mt-7 flex items-center gap-2 bg-red-500 hover:bg-red-600 disabled:opacity-70 text-white px-5 py-3 rounded-2xl font-semibold transition shadow-lg"
+                    >
+
+                      <Trash2 size={18} />
+
+                      {deletingId === b._id
+                        ? "Cancelling..."
+                        : "Cancel Booking"}
+
+                    </button>
+
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+
+        </div>
+
+      </div>
     </div>
   );
 };
