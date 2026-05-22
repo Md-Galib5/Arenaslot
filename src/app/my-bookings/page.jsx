@@ -38,7 +38,6 @@ const MyBookings = () => {
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_SERVER_URL}/bookings/${user.id}`
         );
-
         const data = await res.json();
 
         setBookings(Array.isArray(data) ? data : []);

@@ -8,14 +8,17 @@ const AllFacilities = () => {
   const [facilities, setFacilities] = useState([]);
   const [search, setSearch] = useState("");
   const [type, setType] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchFacilities = async () => {
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL;
+        setLoading(true);
 
+        const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL;
         if (!baseUrl) {
           console.error("Missing NEXT_PUBLIC_SERVER_URL");
+          setLoading(false);
           return;
         }
 
@@ -26,13 +29,17 @@ const AllFacilities = () => {
 
         const url = `${baseUrl}/facilities?${query.toString()}`;
         const res = await fetch(url);
-
         const data = await res.json();
+
+        // ⏳ artificial delay (for smoother UX demo)
+        await new Promise((resolve) => setTimeout(resolve, 600));
 
         setFacilities(Array.isArray(data) ? data : []);
       } catch (error) {
         console.log("FETCH ERROR:", error);
         setFacilities([]);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -42,7 +49,7 @@ const AllFacilities = () => {
   return (
     <div className="w-11/12 mx-auto my-10 space-y-8">
 
-      {/* UI SAME */}
+      {/* HEADER */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
 
         <div>
@@ -88,8 +95,13 @@ const AllFacilities = () => {
         </div>
       </div>
 
-      {/* LIST */}
-      {facilities.length === 0 ? (
+      {/* CONTENT */}
+      {loading ? (
+        <div className="h-[300px] flex flex-col items-center justify-center gap-3">
+          <div className="w-10 h-10 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-gray-500 text-sm">Loading facilities...</p>
+        </div>
+      ) : facilities.length === 0 ? (
         <div className="h-[300px] flex items-center justify-center">
           <p className="text-gray-500">No facilities found</p>
         </div>
