@@ -6,10 +6,7 @@ ArenaSlot is a modern full-stack sports facility booking platform that helps use
 
 Built for speed, simplicity, and real-time availability.
 
-🌐 Live Demo
-
-Add your live link here
-Example: https://arenaslot.live
+🌐 Live Link : https://arenaslot-seven.vercel.app/
 
 ⚙️ Tech Stack
 
